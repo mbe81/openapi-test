@@ -1,0 +1,744 @@
+openapi: 3.0.3
+info:
+  title: PlannedTrip
+  description: REST API for the PlannedTrip Service
+  contact:
+    name: AH Tech Transport
+    email: tech.transport@ah.nl
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+    description: Local development
+paths:
+  '/v1/plannedtrips/{tripId}':
+    parameters:
+      - $ref: '#/components/parameters/tripId'
+    get:
+      summary: Return single PlannedTrip
+      responses:
+        '200':
+          $ref: '#/components/responses/ExistingPlannedTrip'
+        '404':
+          description: Not Found
+      operationId: FindPlannedTripById
+      description: Find a single PlannedTrip based on the tripId
+      tags:
+        - PlannedTrip
+    put:
+      summary: Update single PlannedTrip
+      operationId: CreateOrUpdatePlannedTrip
+      responses:
+        '200':
+          $ref: '#/components/responses/ExistingPlannedTrip'
+        '201':
+          $ref: '#/components/responses/NewPlannedTrip'
+        '404':
+          description: Not Found
+      requestBody:
+        $ref: '#/components/requestBodies/WritePlannedTrip'
+      description: Create or update a single PlannedTrip based on the tripId
+      tags:
+        - PlannedTrip
+    delete:
+      summary: Delete single PlannedTrip
+      operationId: DeletePlannedTrip
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+      description: Delete a single trip based on the tripId
+      tags:
+        - PlannedTrip
+  /v1/plannedtrips:
+    get:
+      summary: Return all the PlannedTrips
+      tags:
+        - PlannedTrip
+      responses:
+        '200':
+          $ref: '#/components/responses/ListOfPlannedTrips'
+      operationId: FindAllPlannedTrips
+      parameters:
+        - in: query
+          name: fromDate
+          schema:
+            type: string
+            format: date
+          description: First date to find PlannedTrips for
+        - in: query
+          name: toDate
+          schema:
+            type: string
+            format: date
+          description: Last date to find PlannedTrips for
+        - in: query
+          name: startLocation
+          schema:
+            type: string
+          description: Start location GLN to find PlannedTrips for
+        - schema:
+            type: string
+          in: query
+          name: tripNumber
+          description: Trip number to find PlannedTrips for
+        - schema:
+            type: string
+          in: query
+          name: taskNumber
+          description: Task number to find PlannedTrips for
+      description: Find all PlannedTrips filtered by the requested parameters
+    post:
+      summary: Create new PlannedTrip
+      operationId: CreatePlannedTrip
+      requestBody:
+        $ref: '#/components/requestBodies/WritePlannedTrip'
+      description: Create a new PlannedTrip
+      tags:
+        - PlannedTrip
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+              description: '/v1/plannedTrips/{tripId}'
+    parameters: []
+components:
+  schemas:
+    PlannedTrip:
+      title: PlannedTrip
+      type: object
+      x-examples: {}
+      description: ''
+      x-internal: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          default: PlannedTrip
+          enum:
+            - PlannedTrip
+        version:
+          type: string
+          example: '1.0'
+        status:
+          type: string
+          enum:
+            - PLANNED
+            - DELETED
+        origin:
+          $ref: '#/components/schemas/Origin'
+        tripDate:
+          type: string
+          format: date
+        tripNumber:
+          type: string
+          example: DCT|2021|44-4-108
+        taskNumber:
+          type: string
+          example: '6388'
+        startDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T08:07:00+02:00'
+        endDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T11:30:00+02:00'
+        locationStart:
+          $ref: '#/components/schemas/Location'
+        requestECMRFlag:
+          type: boolean
+        totalTripDistance:
+          $ref: '#/components/schemas/Distance'
+        carrier:
+          $ref: '#/components/schemas/Carrier'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        transportOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransportOrder'
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+        createdDateTime:
+          type: string
+          example: '2021-10-02T08:07:34+02:00'
+          format: date-time
+        updatedDateTime:
+          type: string
+          example: '2021-10-02T08:07:34+02:00'
+          format: date-time
+      required:
+        - id
+        - type
+        - version
+        - status
+        - origin
+        - tripDate
+        - tripNumber
+        - taskNumber
+        - startDateTime
+        - endDateTime
+        - locationStart
+        - carrier
+        - vehicle
+        - transportOrders
+        - activities
+        - createdDateTime
+        - updatedDateTime
+    PlannedTripWrite:
+      title: PlannedTripWrite
+      type: object
+      x-examples: {}
+      description: ''
+      x-internal: false
+      properties:
+        type:
+          type: string
+          default: PlannedTrip
+          enum:
+            - PlannedTrip
+        version:
+          type: string
+          example: '1.0'
+        status:
+          type: string
+          enum:
+            - PLANNED
+            - DELETED
+        origin:
+          $ref: '#/components/schemas/Origin'
+        tripDate:
+          type: string
+          format: date
+        tripNumber:
+          type: string
+          example: DCT|2021|44-4-108
+        taskNumber:
+          type: string
+          example: '6388'
+        startDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T08:07:00+02:00'
+        endDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T11:30:00+02:00'
+        locationStart:
+          $ref: '#/components/schemas/Location'
+        requestECMRFlag:
+          type: boolean
+        totalTripDistance:
+          $ref: '#/components/schemas/Distance'
+        carrier:
+          $ref: '#/components/schemas/Carrier'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        transportOrders:
+          $ref: '#/components/schemas/TransportOrder'
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+      required:
+        - type
+        - version
+        - status
+        - origin
+        - tripDate
+        - tripNumber
+        - taskNumber
+        - startDateTime
+        - endDateTime
+        - locationStart
+        - carrier
+        - vehicle
+        - transportOrders
+        - activities
+    Origin:
+      title: Origin
+      type: object
+      x-examples: {}
+      properties:
+        source:
+          type: string
+          enum:
+            - Multistop
+        fileName:
+          type: string
+          example: DCT_MultistopRMS202140.xls
+        userId:
+          type: string
+          example: pnlcb310
+      required:
+        - source
+    Location:
+      title: Location
+      type: object
+      x-examples: {}
+      properties:
+        code:
+          type: string
+          description: Unique location code within Albert Heijn Transport
+          example: '1001'
+        gln:
+          type: string
+          minLength: 13
+          maxLength: 13
+          example: '8710400000044'
+        name:
+          type: string
+          example: DC Zaandam
+        address:
+          $ref: '#/components/schemas/Address'
+      required:
+        - code
+        - name
+        - address
+    Address:
+      title: Address
+      type: object
+      x-examples: {}
+      properties:
+        streetName:
+          type: string
+          example: Hoofdtocht
+        houseNumber:
+          type: string
+          example: '11'
+        postalCode:
+          type: string
+          example: 1507 CJ
+        cityName:
+          type: string
+          example: ZAANDAM
+        countryCode:
+          type: string
+          example: NLD
+          minLength: 3
+          maxLength: 3
+        geoLocation:
+          $ref: '#/components/schemas/GeoLocation'
+      required:
+        - streetName
+        - cityName
+        - countryCode
+    GeoLocation:
+      title: GeoLocation
+      type: object
+      properties:
+        latitude:
+          type: number
+          example: 52.43009
+          maximum: 90
+          minimum: -90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+          example: 6.17151
+      required:
+        - latitude
+        - longitude
+      x-examples: {}
+    Carrier:
+      title: Carrier
+      type: object
+      properties:
+        glnCode:
+          type: string
+          example: '8718906726307'
+          minLength: 13
+          maxLength: 13
+          pattern: '^[0-9]'
+        name:
+          type: string
+          example: Simon Loos (DCP)
+      required:
+        - glnCode
+        - name
+    Vehicle:
+      title: Vehicle
+      type: object
+      x-examples: {}
+      properties:
+        compartments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Compartment'
+      required:
+        - compartments
+    Compartment:
+      title: Compartment
+      type: object
+      x-examples: {}
+      properties:
+        id:
+          type: string
+          pattern: '^[A]'
+          example: A
+        type:
+          type: string
+          example: eur_5461
+      required:
+        - id
+        - type
+    Activity:
+      title: Activity
+      oneOf:
+        - $ref: '#/components/schemas/DrivingActivity'
+        - $ref: '#/components/schemas/LoadingActivity'
+        - $ref: '#/components/schemas/CouplingActivity'
+      x-examples: {}
+    DrivingActivity:
+      title: DrivingActivity
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - DRIVING
+            - MARSHALLING
+        startDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T09:30:00+02:00'
+        endDateTime:
+          type: string
+          example: '2021-10-02T09:30:00+02:00'
+          format: date-time
+        location:
+          $ref: '#/components/schemas/Location'
+        distance:
+          $ref: '#/components/schemas/Distance'
+        driveTime:
+          $ref: '#/components/schemas/Duration'
+        delayTime:
+          $ref: '#/components/schemas/Duration'
+        waitTime:
+          $ref: '#/components/schemas/Duration'
+        restTime:
+          $ref: '#/components/schemas/Duration'
+      required:
+        - type
+        - startDateTime
+        - endDateTime
+        - location
+    LoadingActivity:
+      title: LoadingActivity
+      type: object
+      x-examples: {}
+      description: ''
+      properties:
+        type:
+          type: string
+          enum:
+            - LOADING
+            - UNLOADING
+        startDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T09:30:00+02:00'
+        endDateTime:
+          type: string
+          format: date-time
+          example: '2021-10-02T09:30:00+02:00'
+        location:
+          $ref: '#/components/schemas/Location'
+        dockId:
+          type: string
+          example: '34'
+        compartmentId:
+          type: string
+          pattern: '^[A-Z]'
+          example: A
+        transportOrders:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - startDateTime
+        - endDateTime
+        - location
+        - compartmentId
+        - transportOrders
+    CouplingActivity:
+      title: CouplingActivity
+      type: object
+      x-examples: {}
+      properties:
+        type:
+          type: string
+          enum:
+            - COUPLING
+            - DECOUPLING
+        startDateTime:
+          type: string
+          example: '2021-10-02T09:30:00+02:00'
+          format: date-time
+        endDateTime:
+          type: string
+          example: '2021-10-02T09:30:00+02:00'
+          format: date-time
+        location:
+          $ref: '#/components/schemas/Location'
+        compartmentId:
+          type: string
+          pattern: '^[A-Z]'
+          example: A
+      required:
+        - type
+        - startDateTime
+        - endDateTime
+        - location
+        - compartmentId
+    Duration:
+      title: Duration
+      type: object
+      x-examples: {}
+      properties:
+        value:
+          type: integer
+          minimum: 1
+          example: 300
+        unit:
+          type: string
+          enum:
+            - SECONDS
+      required:
+        - value
+        - unit
+    Distance:
+      title: Distance
+      type: object
+      properties:
+        value:
+          type: integer
+          minimum: 0
+          example: 75
+        unit:
+          type: string
+          enum:
+            - KILOMETERS
+      required:
+        - value
+        - unit
+    TransportOrder:
+      title: TransportOrder
+      type: object
+      x-examples:
+        example-1:
+          orderReference: 10012130HH
+          commodity: AMBIENT
+          relatedOrders:
+            - source: Albert Heijn
+              orderReference: '123456789'
+          consignor:
+            code: '1001'
+            gln: '8710400000044'
+            name: DC Zaandam
+            address:
+              streetName: Hoofdtocht
+              houseNumber: '11'
+              postalCode: 1507 CJ
+              cityName: ZAANDAM
+              countryCode: NLD
+              geoLocation:
+                latitude: 52.43009
+                longitude: 6.17151
+          consginee:
+            code: '1001'
+            gln: '8710400000044'
+            name: DC Zaandam
+            address:
+              streetName: Hoofdtocht
+              houseNumber: '11'
+              postalCode: 1507 CJ
+              cityName: ZAANDAM
+              countryCode: NLD
+              geoLocation:
+                latitude: 52.43009
+                longitude: 6.17151
+          shipFrom:
+            code: '1001'
+            gln: '8710400000044'
+            name: DC Zaandam
+            address:
+              streetName: Hoofdtocht
+              houseNumber: '11'
+              postalCode: 1507 CJ
+              cityName: ZAANDAM
+              countryCode: NLD
+              geoLocation:
+                latitude: 52.43009
+                longitude: 6.17151
+          shipTo:
+            code: '1001'
+            gln: '8710400000044'
+            name: DC Zaandam
+            address:
+              streetName: Hoofdtocht
+              houseNumber: '11'
+              postalCode: 1507 CJ
+              cityName: ZAANDAM
+              countryCode: NLD
+              geoLocation:
+                latitude: 52.43009
+                longitude: 6.17151
+          requestedDeliveryWindow:
+            startDateTime: '2021-10-02T09:30:00+02:00'
+            endDateTime: '2021-10-02T10:30:00+02:00'
+          requestedPickupWindow:
+            startDateTime: '2021-10-02T09:30:00+02:00'
+            endDateTime: '2021-10-02T10:30:00+02:00'
+          shippingStageOpenWindow:
+            startDateTime: '2021-10-02T09:30:00+02:00'
+            endDateTime: '2021-10-02T10:30:00+02:00'
+          shippingStageLocation: string
+          remarks: 3x kloppen want de bel doet het niet
+      description: ''
+      properties:
+        orderReference:
+          type: string
+          example: 10012130HH
+        commodity:
+          type: string
+          enum:
+            - AMBIENT
+            - FRESH
+            - FROZEN
+            - RETURNS
+        relatedOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedOrders'
+        consignor:
+          $ref: '#/components/schemas/Location'
+        consginee:
+          $ref: '#/components/schemas/Location'
+        shipFrom:
+          $ref: '#/components/schemas/Location'
+        shipTo:
+          $ref: '#/components/schemas/Location'
+        requestedDeliveryWindow:
+          $ref: '#/components/schemas/TimeWindow'
+        requestedPickupWindow:
+          $ref: '#/components/schemas/TimeWindow'
+        shippingStageOpenWindow:
+          $ref: '#/components/schemas/TimeWindow'
+        shippingStageLocation:
+          type: string
+        remarks:
+          type: string
+          example: 3x kloppen want de bel doet het niet
+      required:
+        - orderReference
+        - commodity
+        - consignor
+        - consginee
+        - shipFrom
+        - shipTo
+    TimeWindow:
+      title: TimeWindow
+      type: object
+      properties:
+        startDateTime:
+          type: string
+          example: '2021-10-02T09:30:00+02:00'
+          format: date-time
+        endDateTime:
+          type: string
+          example: '2021-10-02T10:30:00+02:00'
+          format: date-time
+      required:
+        - startDateTime
+        - endDateTime
+    TransportVolume:
+      title: TransportVolume
+      type: object
+      x-examples: {}
+      properties:
+        numberOfLoadCarriers:
+          type: integer
+          minimum: 1
+        loadCarrierType:
+          type: string
+          enum:
+            - PALLET
+            - DOLLY
+            - ROLLY
+            - DISPLAY
+            - CONTAINER
+    RelatedOrders:
+      title: RelatedOrders
+      type: object
+      x-examples: {}
+      properties:
+        source:
+          type: string
+          example: Albert Heijn
+        orderReference:
+          type: string
+          example: '123456789'
+      required:
+        - source
+        - orderReference
+  requestBodies:
+    WritePlannedTrip:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlannedTripWrite'
+          examples: {}
+  responses:
+    ExistingPlannedTrip:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlannedTrip'
+        application/xml:
+          schema:
+            type: object
+            properties: {}
+      headers: {}
+    ListOfPlannedTrips:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/PlannedTrip'
+    NewPlannedTrip:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PlannedTrip'
+          examples: {}
+      headers:
+        Location:
+          schema:
+            type: string
+            format: uri-reference
+  parameters:
+    tripId:
+      name: tripId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Id of the trip
+tags:
+  - name: PlannedTrip
